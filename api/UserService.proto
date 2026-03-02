@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package userGRPC;
+
+option go_package = "grpc/pb;pb";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/descriptor.proto";
+//import "google/api/http.proto";
+import "google/api/annotations.proto";
+
+service UserService {
+  rpc HealthCheck(google.protobuf.Empty) returns (HealthResponse) {
+    option (google.api.http) = {
+      get: "/health"
+    };
+  }
+
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post: "/user/register"
+      body: "*"
+    };
+  }
+
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      get: "/user/get/{username}"
+    };
+  }
+
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      put: "/user/update/{username}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+    option (google.api.http) = {
+      delete: "/user/delete/{username}"
+    };
+  }
+}
+
+message HealthResponse {
+  string status = 1;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+  string name     = 4;
+  string surname  = 5;
+  string birth    = 6;
+}
+
+message CreateUserResponse {
+  bool success = 1;
+  string id = 2;//returns UUID
+}
+
+message GetUserRequest{
+  string username = 1;
+}
+
+message GetUserResponse{
+  UserResponse user = 1;
+}
+
+message UpdateUserRequest{
+  string username = 1;
+  string email = 2;
+  string name = 3;
+  string surname = 4;
+  string birth=5;
+}
+
+message UpdateUserResponse{
+  bool success = 1;
+  UserResponse user = 2;
+}
+
+message DeleteUserRequest{
+  string username = 1;
+}
+
+message DeleteUserResponse{
+  bool success = 1;
+}
+
+message User {
+  string id=1; //UUID
+  string username = 2;
+  string password = 3; //храним хэш
+  string email = 4;
+  string name = 5;
+  string surname = 6;
+  string birth = 7; //YYYY-MM-DD
+}
+
+message UserResponse {
+  string id=1; //UUID
+  string username = 2;
+  string email = 3;
+  string name = 4;
+  string surname = 5;
+  string birth = 6; //YYYY-MM-DD
+}
