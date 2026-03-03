@@ -27,6 +27,15 @@ func (r *Repository) GetByUsername(ctx context.Context, username string) (*User,
 	return &u, nil
 }
 
+func (r *Repository) GetByLogin(ctx context.Context, login string) (*User, error) {
+	var u User
+	err := r.db.WithContext(ctx).Where("username = ? OR email = ?", login, login).First(&u).Error
+	if err != nil {
+		return nil, fmt.Errorf("User not found: %w", err)
+	}
+	return &u, nil
+}
+
 func (r *Repository) Update(ctx context.Context, username, email, name, surname, birth string) (*User, error) {
 	var u User
 	err := r.db.WithContext(ctx).
@@ -45,6 +54,9 @@ func (r *Repository) Update(ctx context.Context, username, email, name, surname,
 }
 
 func (r *Repository) Delete(ctx context.Context, username string) error {
+	if _, err := r.GetByUsername(ctx, username); err != nil {
+		return err
+	}
 	return r.db.WithContext(ctx).
 		Where("username = ?", username).
 		Delete(&User{}).Error

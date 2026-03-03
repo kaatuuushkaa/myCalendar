@@ -9,9 +9,13 @@ import (
 	"log"
 	pb "myCalendar/grpc/pb"
 	"myCalendar/internal/db"
+	"myCalendar/internal/jwt"
+	"myCalendar/internal/middleware"
 	"myCalendar/internal/user"
 	"net"
 	"net/http"
+	"os"
+	"strings"
 )
 
 func main() {
@@ -20,11 +24,18 @@ func main() {
 		log.Fatalf("Could not connect to DB: %v", err)
 	}
 
+	key := os.Getenv("JWT_KEY")
+	if key == "" {
+		log.Fatalf("JWT_KEY not set in .env")
+	}
+	jwtService := jwt.New(key)
+
 	repo := user.NewRepository(database)
 	service := user.NewService(repo)
-	handler := user.NewHandler(service)
+	handler := user.NewHandler(service, jwtService)
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(middleware.AuthInterceptor(jwtService)))
 	pb.RegisterUserServiceServer(grpcServer, handler)
 	reflection.Register(grpcServer) //for curl
 
@@ -34,7 +45,13 @@ func main() {
 	}
 
 	ctx := context.Background()
-	mux := runtime.NewServeMux()
+	mux := runtime.NewServeMux(
+		runtime.WithIncomingHeaderMatcher(func(key string) (string, bool) {
+			if strings.ToLower(key) == "authorization" {
+				return key, true
+			}
+			return runtime.DefaultHeaderMatcher(key)
+		}))
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
