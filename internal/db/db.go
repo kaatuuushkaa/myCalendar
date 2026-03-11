@@ -20,7 +20,6 @@ func InitDB() (*gorm.DB, error) {
 
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-
 		return nil, fmt.Errorf("could not connect to database: %v", err)
 	}
 

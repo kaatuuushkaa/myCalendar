@@ -10,6 +10,14 @@ type Repository struct {
 	db *gorm.DB
 }
 
+type RepositoryInterface interface {
+	Create(ctx context.Context, u *User) error
+	GetByUsername(ctx context.Context, username string) (*User, error)
+	GetByLogin(ctx context.Context, login string) (*User, error)
+	Update(ctx context.Context, username, email, name, surname, birth string) (*User, error)
+	Delete(ctx context.Context, username string) error
+}
+
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{db: db}
 }

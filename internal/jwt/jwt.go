@@ -86,7 +86,7 @@ func (j *JWT) GenerateRefreshToken(id string, isValid bool, seconds int) (string
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	secret, err := token.SignedString([]byte(j.secret))
 	if err != nil {
-		log.Fatalf("[jwt][id:%d] error generating jwt", id)
+		log.Fatalf("[jwt][id:%s] error generating jwt", id)
 		return "", exp
 	}
 
