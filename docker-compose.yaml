@@ -20,6 +20,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: yourpassword
       POSTGRES_DB: postgres
+      ENV: production
     ports:
       - "5433:5432"
     volumes:

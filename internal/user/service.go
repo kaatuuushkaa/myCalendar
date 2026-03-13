@@ -4,17 +4,20 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	pb "myCalendar/grpc/pb"
 	"myCalendar/internal/jwt"
 )
 
 type Service struct {
-	repo RepositoryInterface
+	repo       RepositoryInterface
+	log        *zap.Logger
+	jwtService jwt.IJWT
 }
 
-func NewService(repo RepositoryInterface) *Service {
-	return &Service{repo: repo}
+func NewService(repo RepositoryInterface, log *zap.Logger, jwtService jwt.IJWT) *Service {
+	return &Service{repo: repo, log: log, jwtService: jwtService}
 }
 
 func (s *Service) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
@@ -65,7 +68,7 @@ func (s *Service) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*p
 	return &pb.DeleteUserResponse{Success: true}, nil
 }
 
-func (s *Service) Auth(ctx context.Context, req *pb.AuthRequest, jwtService jwt.IJWT) (*pb.AuthResponse, error) {
+func (s *Service) Auth(ctx context.Context, req *pb.AuthRequest) (*pb.AuthResponse, error) {
 	u, err := s.repo.GetByLogin(ctx, req.Login)
 	if err != nil {
 		return nil, err
@@ -74,8 +77,8 @@ func (s *Service) Auth(ctx context.Context, req *pb.AuthRequest, jwtService jwt.
 		return nil, fmt.Errorf("Incorrect password")
 	}
 
-	accessToken := jwtService.GenerateJWT(u.ID, true, jwt.Hour)
-	refreshToken, _ := jwtService.GenerateRefreshToken(u.ID, true, jwt.Day*7)
+	accessToken := s.jwtService.GenerateJWT(u.ID, true, jwt.Hour)
+	refreshToken, _ := s.jwtService.GenerateRefreshToken(u.ID, true, jwt.Day*7)
 
 	return &pb.AuthResponse{
 		Success:      true,

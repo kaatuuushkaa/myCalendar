@@ -6,17 +6,16 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	pb "myCalendar/grpc/pb"
-	"myCalendar/internal/jwt"
+	"strings"
 )
 
 type Handler struct {
 	pb.UnimplementedUserServiceServer
-	service    *Service
-	jwtService jwt.IJWT
+	service *Service
 }
 
-func NewHandler(service *Service, jwtService jwt.IJWT) *Handler {
-	return &Handler{service: service, jwtService: jwtService}
+func NewHandler(service *Service) *Handler {
+	return &Handler{service: service}
 }
 
 func (h *Handler) HealthCheck(ctx context.Context, _ *emptypb.Empty) (*pb.HealthResponse, error) {
@@ -24,7 +23,23 @@ func (h *Handler) HealthCheck(ctx context.Context, _ *emptypb.Empty) (*pb.Health
 }
 
 func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+	if err := validateCreateUser(req); err != nil {
+		return nil, err
+	}
 	return h.service.CreateUser(ctx, req)
+}
+
+func validateCreateUser(req *pb.CreateUserRequest) error {
+	if req.Username == "" {
+		return status.Error(codes.InvalidArgument, "username is required")
+	}
+	if len(req.Password) < 8 {
+		return status.Error(codes.InvalidArgument, "password must be at least 8 characters")
+	}
+	if !strings.Contains(req.Email, "@") {
+		return status.Error(codes.InvalidArgument, "invalid email")
+	}
+	return nil
 }
 
 func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
@@ -49,7 +64,7 @@ func (h *Handler) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*p
 }
 
 func (h *Handler) Auth(ctx context.Context, req *pb.AuthRequest) (*pb.AuthResponse, error) {
-	return h.service.Auth(ctx, req, h.jwtService)
+	return h.service.Auth(ctx, req)
 }
 
 func userIDFromTokenCtx(ctx context.Context) (string, error) {

@@ -4,24 +4,25 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"os"
+	"gorm.io/gorm/logger"
+	"myCalendar/internal/config"
 )
 
-var db *gorm.DB
-
-func InitDB() (*gorm.DB, error) {
-	host := os.Getenv("DB_HOST")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	name := os.Getenv("DB_NAME")
-	port := os.Getenv("DB_PORT")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, password, name, port)
-	var err error
-
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func New(cfg config.DBConfig) (*gorm.DB, error) {
+	db, err := gorm.Open(postgres.Open(cfg.DSN()), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
-		return nil, fmt.Errorf("could not connect to database: %v", err)
+		return nil, fmt.Errorf("connect to database: %w", err)
 	}
+
+	// пул соединений — важно для продакшена
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("get sql db: %w", err)
+	}
+	sqlDB.SetMaxOpenConns(25)
+	sqlDB.SetMaxIdleConns(5)
 
 	return db, nil
 }
