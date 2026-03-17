@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/rs/cors"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -25,15 +26,6 @@ import (
 )
 
 func main() {
-	//database, err := db.InitDB()
-	//if err != nil {
-	//	log.Fatalf("Could not connect to DB: %v", err)
-	//}
-	//
-	//key := os.Getenv("JWT_KEY")
-	//if key == "" {
-	//	log.Fatalf("JWT_KEY not set in .env")
-	//}
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal("failed to load config", zap.Error(err))
@@ -82,9 +74,21 @@ func main() {
 		log.Fatal("Failed to register gateway: %v", zap.Error(err))
 	}
 
+	//cors middleware
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{
+			"http://localhost:3000",
+		},
+
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		ExposedHeaders:   []string{"Content-Length"},
+		AllowCredentials: true,
+	})
+
 	httpServer := &http.Server{
 		Addr:    ":" + cfg.Server.HTTPPort,
-		Handler: mux,
+		Handler: c.Handler(mux),
 	}
 
 	go func() {
