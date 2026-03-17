@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"myCalendar/internal/ctxutil"
 	"myCalendar/internal/jwt"
 	"strings"
 )
@@ -36,7 +37,7 @@ func AuthInterceptor(jwtService jwt.IJWT) grpc.UnaryServerInterceptor {
 			return nil, status.Error(codes.Unauthenticated, "Invalid token")
 		}
 
-		ctx = context.WithValue(ctx, "user_id", claims.ID)
+		ctx = ctxutil.NewContextWithUserID(ctx, claims.ID)
 		return handler(ctx, req)
 	}
 }
