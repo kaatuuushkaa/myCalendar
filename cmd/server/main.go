@@ -16,10 +16,15 @@ import (
 	"myCalendar/internal/middleware"
 	"myCalendar/internal/rpc"
 	"myCalendar/internal/rpc/auth"
+	"myCalendar/internal/rpc/create_event"
 	"myCalendar/internal/rpc/create_user"
+	"myCalendar/internal/rpc/delete_event"
 	"myCalendar/internal/rpc/delete_user"
+	"myCalendar/internal/rpc/get_event"
 	"myCalendar/internal/rpc/get_user"
+	"myCalendar/internal/rpc/get_user_events"
 	"myCalendar/internal/rpc/health"
+	"myCalendar/internal/rpc/update_event"
 	"myCalendar/internal/rpc/update_user"
 	"myCalendar/internal/storage/pgrepo"
 	"myCalendar/internal/storage/postgres"
@@ -67,9 +72,26 @@ func main() {
 		deleteUserHandler,
 	)
 
+	eventRepo := pgrepo.NewEventRepo(database)
+
+	createEventHandler := create_event.New(eventRepo, log)
+	getEventHandler := get_event.New(eventRepo, log)
+	getUserEventsHandler := get_user_events.New(eventRepo, log)
+	updateEventHandler := update_event.New(eventRepo, log)
+	deleteEventHandler := delete_event.New(eventRepo, log)
+
+	eventServer := rpc.NewEventServer(
+		createEventHandler,
+		getEventHandler,
+		getUserEventsHandler,
+		updateEventHandler,
+		deleteEventHandler,
+	)
+
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(middleware.AuthInterceptor(jwtService)))
 	pb.RegisterUserServiceServer(grpcServer, userServer)
+	pb.RegisterEventServiceServer(grpcServer, eventServer)
 	reflection.Register(grpcServer) //for curl
 
 	lis, err := net.Listen("tcp", ":"+cfg.Server.GRPCPort)

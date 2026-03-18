@@ -1,4 +1,4 @@
-package event
+package domain
 
 import "time"
 
@@ -9,5 +9,5 @@ type Event struct {
 	Description string
 	StartAt     time.Time `gorm:"not null"`
 	EndAt       time.Time `gorm:"not null"`
-	EventDate   string    `gorm:"type:date;not null;index"`
+	EventDate   string
 }

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS events (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    title TEXT NOT NULL
+    user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
     description TEXT,
     start_at TIMESTAMP WITH TIME ZONE NOT NULL,
     end_at TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS events (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP DEFAULT NULL
-)
+);
 
 CREATE INDEX IF NOT EXISTS idx_events_user_id ON events(user_id);
 CREATE INDEX IF NOT EXISTS idx_events_event_date ON events(event_date);

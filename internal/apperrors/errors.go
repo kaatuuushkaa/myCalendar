@@ -13,6 +13,14 @@ var (
 	ErrAccessDenied    = status.Error(codes.PermissionDenied, "access denied")    //403
 )
 
+// event errors
+var (
+	ErrEventNotFound  = status.Error(codes.NotFound, "event not found")
+	ErrInvalidTime    = status.Error(codes.InvalidArgument, "invalid time")
+	ErrInvadArgument  = status.Error(codes.InvalidArgument, "event id is required")
+	ErrEndBeforeStart = status.Error(codes.InvalidArgument, "end_at must be after start_at")
+)
+
 // auth errors
 var (
 	ErrInvalidToken = status.Error(codes.Unauthenticated, "invalid token")

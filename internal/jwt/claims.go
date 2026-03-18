@@ -3,7 +3,7 @@ package jwt
 import "github.com/golang-jwt/jwt/v5"
 
 type Claims struct {
-	ID      string `json:"id"`
+	ID      string `json:"user_id"`
 	IsValid bool   `json:"is_valid"`
 	jwt.RegisteredClaims
 }
