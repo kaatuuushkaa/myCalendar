@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package eventGRPC;
+
+option go_package = "grpc/pb;pb";
+
+import "google/protobuf/descriptor.proto";
+import "google/api/annotations.proto";
+
+service EventService {
+  rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse) {
+    option (google.api.http) = {
+      post: "/event/create"
+      body: "*"
+    };
+  }
+
+  rpc GetEvent(GetEventRequest) returns (GetEventResponse) {
+    option (google.api.http) = {
+      get: "/event/{id}"
+    };
+  }
+
+  rpc GetUserEvents(GetUserEventsRequest) returns (GetUserEventsResponse) {
+    option (google.api.http) = {
+      get: "/event/list"
+    };
+  }
+
+  rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse) {
+    option (google.api.http) = {
+      put: "/event/update/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse) {
+    option (google.api.http) = {
+      delete: "/event/delete/{id}"
+    };
+  }
+}
+
+message Event {
+  string id          = 1;
+  string user_id     = 2;
+  string title       = 3;
+  string description = 4;
+  string start_at    = 5;
+  string end_at      = 6;
+  string event_date  = 7;
+}
+
+message CreateEventRequest {
+  string title       = 1;
+  string description = 2;
+  string start_at    = 3;
+  string end_at      = 4;
+}
+
+message CreateEventResponse {
+  bool   success = 1;
+  string id      = 2;
+}
+
+message GetEventRequest {
+  string id = 1;
+}
+
+message GetEventResponse {
+  Event event = 1;
+}
+
+message GetUserEventsRequest {}
+
+message GetUserEventsResponse {
+  repeated Event events = 1;
+}
+
+message UpdateEventRequest {
+  string id = 1;
+  string title       = 2;
+  string description = 3;
+  string start_at    = 4;
+  string end_at      = 5;
+}
+
+message UpdateEventResponse {
+  bool  success = 1;
+  Event event   = 2;
+}
+
+message DeleteEventRequest {
+  string id = 1;
+}
+
+message DeleteEventResponse {
+  bool success = 1;
+}

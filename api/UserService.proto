@@ -48,6 +48,13 @@ service UserService {
       body: "*"
     };
   }
+
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse) {
+    option (google.api.http) = {
+      put: "/user/reset-password/{username}"
+      body: "*"
+    };
+  }
 }
 
 message HealthResponse {
@@ -125,4 +132,14 @@ message AuthResponse {
   bool success = 1;
   string access_token = 2;
   string refresh_token = 3;
+}
+
+message ResetPasswordRequest{
+  string username = 1;
+  string oldPassword = 2;
+  string newPassword = 3;
+}
+
+message ResetPasswordResponse {
+  bool success=1;
 }
