@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/encoding/protojson"
 	"log"
 	pb "myCalendar/grpc/pb"
 	"myCalendar/internal/config"
@@ -24,6 +25,7 @@ import (
 	"myCalendar/internal/rpc/get_user"
 	"myCalendar/internal/rpc/get_user_events"
 	"myCalendar/internal/rpc/health"
+	"myCalendar/internal/rpc/reset_password"
 	"myCalendar/internal/rpc/update_event"
 	"myCalendar/internal/rpc/update_user"
 	"myCalendar/internal/storage/pgrepo"
@@ -62,6 +64,7 @@ func main() {
 	getUserHandler := get_user.New(userRepo, log)
 	updateUserHandler := update_user.New(userRepo, log)
 	deleteUserHandler := delete_user.New(userRepo, log)
+	resetPasswordHandler := reset_password.New(userRepo, log)
 
 	userServer := rpc.NewUserServer(
 		healthHandler,
@@ -70,6 +73,7 @@ func main() {
 		getUserHandler,
 		updateUserHandler,
 		deleteUserHandler,
+		resetPasswordHandler,
 	)
 
 	eventRepo := pgrepo.NewEventRepo(database)
@@ -107,7 +111,13 @@ func main() {
 				return key, true
 			}
 			return runtime.DefaultHeaderMatcher(key)
-		}))
+		}),
+		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
+			MarshalOptions: protojson.MarshalOptions{
+				UseProtoNames: true,
+			},
+		}),
+	)
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
@@ -115,6 +125,11 @@ func main() {
 	err = pb.RegisterUserServiceHandlerFromEndpoint(ctx, mux, "localhost:"+cfg.Server.GRPCPort, opts)
 	if err != nil {
 		log.Fatal("Failed to register gateway: %v", zap.Error(err))
+	}
+
+	err = pb.RegisterEventServiceHandlerFromEndpoint(ctx, mux, "localhost:"+cfg.Server.GRPCPort, opts)
+	if err != nil {
+		log.Fatal("Failed to register event gateway: %v", zap.Error(err))
 	}
 
 	//cors middleware

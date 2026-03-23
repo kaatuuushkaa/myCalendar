@@ -84,3 +84,21 @@ func (r *UserRepo) Delete(ctx context.Context, username string) error {
 	}
 	return nil
 }
+
+func (r *UserRepo) ResetPassword(ctx context.Context, username, password string) error {
+	var u domain.User
+	err := r.db.WithContext(ctx).Where("username = ?", username).First(&u).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return apperrors.ErrUserNotFound
+		}
+		return apperrors.ErrInternal
+	}
+
+	u.Password = password
+	if err = r.db.WithContext(ctx).Save(&u).Error; err != nil {
+		return apperrors.ErrInternal
+	}
+
+	return nil
+}

@@ -7,10 +7,13 @@ import (
 
 // user errors
 var (
-	ErrUserNotFound    = status.Error(codes.NotFound, "user not found")           //404
-	ErrUserExists      = status.Error(codes.AlreadyExists, "user already exists") //409
-	ErrInvalidPassword = status.Error(codes.Unauthenticated, "invalid password")  //401
-	ErrAccessDenied    = status.Error(codes.PermissionDenied, "access denied")    //403
+	ErrUserNotFound       = status.Error(codes.NotFound, "user not found")           //404
+	ErrUserExists         = status.Error(codes.AlreadyExists, "user already exists") //409
+	ErrInvalidPassword    = status.Error(codes.Unauthenticated, "invalid password")  //401
+	ErrAccessDenied       = status.Error(codes.PermissionDenied, "access denied")    //403
+	ErrInvalidLenPassword = status.Error(codes.InvalidArgument, "password must be at least 8 characters")
+	ErrEmptyUsername      = status.Error(codes.InvalidArgument, "username is required")
+	ErrInvalidEmail       = status.Error(codes.InvalidArgument, "invalid email")
 )
 
 // event errors

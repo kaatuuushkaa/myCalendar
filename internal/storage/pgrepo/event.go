@@ -6,7 +6,6 @@ import (
 	"gorm.io/gorm"
 	"myCalendar/internal/apperrors"
 	"myCalendar/internal/domain"
-	"time"
 )
 
 type EventRepo struct {
@@ -48,28 +47,32 @@ func (r *EventRepo) GetByUserID(ctx context.Context, userID string) ([]domain.Ev
 	return e, nil
 }
 
-func (r *EventRepo) Update(ctx context.Context, id, title, description, eventDate string, startAt, endAt time.Time) (domain.Event, error) {
-	var e domain.Event
-	err := r.db.WithContext(ctx).
-		Where("id = ?", id).
-		First(&e).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return domain.Event{}, apperrors.ErrEventNotFound
-		}
+func (r *EventRepo) Update(ctx context.Context, e domain.Event) (domain.Event, error) {
+	//var e domain.Event
+	//err := r.db.WithContext(ctx).
+	//	Where("id = ?", id).
+	//	First(&e).Error
+	//if err != nil {
+	//	if errors.Is(err, gorm.ErrRecordNotFound) {
+	//		return domain.Event{}, apperrors.ErrEventNotFound
+	//	}
+	//	return domain.Event{}, apperrors.ErrInternal
+	//}
+	//
+	//e.Title = title
+	//e.Description = description
+	//e.StartAt = startAt
+	//e.EndAt = endAt
+	//e.EventDate = eventDate
+	//
+	//if err = r.db.WithContext(ctx).Save(&e).Error; err != nil {
+	//	return domain.Event{}, apperrors.ErrInternal
+	//}
+	//
+	//return e, nil
+	if err := r.db.WithContext(ctx).Save(&e).Error; err != nil {
 		return domain.Event{}, apperrors.ErrInternal
 	}
-
-	e.Title = title
-	e.Description = description
-	e.StartAt = startAt
-	e.EndAt = endAt
-	e.EventDate = eventDate
-
-	if err = r.db.WithContext(ctx).Save(&e).Error; err != nil {
-		return domain.Event{}, apperrors.ErrInternal
-	}
-
 	return e, nil
 }
 

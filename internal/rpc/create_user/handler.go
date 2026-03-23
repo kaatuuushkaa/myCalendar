@@ -7,9 +7,6 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	pb "myCalendar/grpc/pb"
 	"myCalendar/internal/apperrors"
 	"myCalendar/internal/domain"
@@ -63,13 +60,13 @@ func (h *Handler) Handle(ctx context.Context, req *pb.CreateUserRequest) (*pb.Cr
 
 func validate(req *pb.CreateUserRequest) error {
 	if req.Username == "" {
-		return status.Error(codes.InvalidArgument, "username is required")
+		return apperrors.ErrEmptyUsername
 	}
 	if len(req.Password) < 8 {
-		return status.Error(codes.InvalidArgument, "password must be at least 8 characters")
+		return apperrors.ErrInvalidLenPassword
 	}
 	if !strings.Contains(req.Email, "@") {
-		return status.Error(codes.InvalidArgument, "invalid email")
+		return apperrors.ErrInvalidEmail
 	}
 	return nil
 }

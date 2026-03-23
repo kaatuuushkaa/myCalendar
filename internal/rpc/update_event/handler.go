@@ -64,7 +64,7 @@ func (h *Handler) Handle(ctx context.Context, req *pb.UpdateEventRequest) (*pb.U
 	e.EndAt = endAt
 	e.EventDate = startAt.Format("2006-01-02")
 
-	event_updated, err := h.repo.Update(ctx, e.ID, e.Title, e.UserID, e.EventDate, e.StartAt, e.EndAt)
+	event_updated, err := h.repo.Update(ctx, e)
 	if err != nil {
 		return nil, err
 	}

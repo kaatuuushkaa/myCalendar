@@ -3,6 +3,7 @@ package update_user
 import (
 	"context"
 	"myCalendar/internal/domain"
+	"strings"
 
 	"go.uber.org/zap"
 
@@ -21,6 +22,10 @@ func New(repo repo, log *zap.Logger) *Handler {
 }
 
 func (h *Handler) Handle(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
+	if err := validate(req); err != nil {
+		return nil, err
+	}
+
 	tokenUserID, err := ctxutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, err
@@ -46,6 +51,16 @@ func (h *Handler) Handle(ctx context.Context, req *pb.UpdateUserRequest) (*pb.Up
 	h.log.Info("user updated", zap.String("username", req.Username))
 
 	return &pb.UpdateUserResponse{Success: true, User: toProto(updated)}, nil
+}
+
+func validate(req *pb.UpdateUserRequest) error {
+	if req.Username == "" {
+		return apperrors.ErrEmptyUsername
+	}
+	if !strings.Contains(req.Email, "@") {
+		return apperrors.ErrInvalidEmail
+	}
+	return nil
 }
 
 func toProto(u domain.User) *pb.UserResponse {
