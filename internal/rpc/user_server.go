@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"myCalendar/internal/rpc/get_user_by_login"
 	"myCalendar/internal/rpc/reset_password"
 
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -17,13 +18,14 @@ import (
 
 type UserServer struct {
 	pb.UnimplementedUserServiceServer
-	health        *health.Handler
-	createUser    *create_user.Handler
-	auth          *auth.Handler
-	getUser       *get_user.Handler
-	updateUser    *update_user.Handler
-	deleteUser    *delete_user.Handler
-	resetPassword *reset_password.Handler
+	health         *health.Handler
+	createUser     *create_user.Handler
+	auth           *auth.Handler
+	getUser        *get_user.Handler
+	updateUser     *update_user.Handler
+	deleteUser     *delete_user.Handler
+	resetPassword  *reset_password.Handler
+	getUserByLogin *get_user_by_login.Handler
 }
 
 func NewUserServer(
@@ -34,15 +36,17 @@ func NewUserServer(
 	updateUser *update_user.Handler,
 	deleteUser *delete_user.Handler,
 	resetPassword *reset_password.Handler,
+	getUserByLogin *get_user_by_login.Handler,
 ) *UserServer {
 	return &UserServer{
-		health:        health,
-		createUser:    createUser,
-		auth:          auth,
-		getUser:       getUser,
-		updateUser:    updateUser,
-		deleteUser:    deleteUser,
-		resetPassword: resetPassword,
+		health:         health,
+		createUser:     createUser,
+		auth:           auth,
+		getUser:        getUser,
+		updateUser:     updateUser,
+		deleteUser:     deleteUser,
+		resetPassword:  resetPassword,
+		getUserByLogin: getUserByLogin,
 	}
 }
 
@@ -72,4 +76,8 @@ func (s *UserServer) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) 
 
 func (s *UserServer) ResetPassword(ctx context.Context, req *pb.ResetPasswordRequest) (*pb.ResetPasswordResponse, error) {
 	return s.resetPassword.Handle(ctx, req)
+}
+
+func (s *UserServer) GetUserByLogin(ctx context.Context, req *pb.GetUserByLoginRequest) (*pb.GetUserResponse, error) {
+	return s.getUserByLogin.Handle(ctx, req)
 }

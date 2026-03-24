@@ -55,6 +55,12 @@ service UserService {
       body: "*"
     };
   }
+
+  rpc GetUserByLogin(GetUserByLoginRequest) returns (GetUserResponse) {
+    option(google.api.http) = {
+      get: "/user/by-login/{login}"
+      };
+  }
 }
 
 message HealthResponse {
@@ -142,4 +148,8 @@ message ResetPasswordRequest{
 
 message ResetPasswordResponse {
   bool success=1;
+}
+
+message GetUserByLoginRequest {
+  string login = 1;
 }

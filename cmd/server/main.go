@@ -23,6 +23,7 @@ import (
 	"myCalendar/internal/rpc/delete_user"
 	"myCalendar/internal/rpc/get_event"
 	"myCalendar/internal/rpc/get_user"
+	"myCalendar/internal/rpc/get_user_by_login"
 	"myCalendar/internal/rpc/get_user_events"
 	"myCalendar/internal/rpc/health"
 	"myCalendar/internal/rpc/reset_password"
@@ -65,6 +66,7 @@ func main() {
 	updateUserHandler := update_user.New(userRepo, log)
 	deleteUserHandler := delete_user.New(userRepo, log)
 	resetPasswordHandler := reset_password.New(userRepo, log)
+	getUserByLoginHandler := get_user_by_login.New(userRepo, log)
 
 	userServer := rpc.NewUserServer(
 		healthHandler,
@@ -74,6 +76,7 @@ func main() {
 		updateUserHandler,
 		deleteUserHandler,
 		resetPasswordHandler,
+		getUserByLoginHandler,
 	)
 
 	eventRepo := pgrepo.NewEventRepo(database)

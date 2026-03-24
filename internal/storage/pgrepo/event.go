@@ -37,7 +37,7 @@ func (r *EventRepo) GetByID(ctx context.Context, id string) (domain.Event, error
 
 func (r *EventRepo) GetByUserID(ctx context.Context, userID string) ([]domain.Event, error) {
 	var e []domain.Event
-	err := r.db.WithContext(ctx).Where("user_id = ?", userID).Order("start_at ASC").First(&e).Error
+	err := r.db.WithContext(ctx).Where("user_id = ?", userID).Order("start_at ASC").Find(&e).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.ErrEventNotFound
