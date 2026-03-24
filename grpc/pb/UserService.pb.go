@@ -900,6 +900,50 @@ func (x *ResetPasswordResponse) GetSuccess() bool {
 	return false
 }
 
+type GetUserByLoginRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Login         string                 `protobuf:"bytes,1,opt,name=login,proto3" json:"login,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserByLoginRequest) Reset() {
+	*x = GetUserByLoginRequest{}
+	mi := &file_UserService_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserByLoginRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserByLoginRequest) ProtoMessage() {}
+
+func (x *GetUserByLoginRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_UserService_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserByLoginRequest.ProtoReflect.Descriptor instead.
+func (*GetUserByLoginRequest) Descriptor() ([]byte, []int) {
+	return file_UserService_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetUserByLoginRequest) GetLogin() string {
+	if x != nil {
+		return x.Login
+	}
+	return ""
+}
+
 var File_UserService_proto protoreflect.FileDescriptor
 
 const file_UserService_proto_rawDesc = "" +
@@ -961,7 +1005,9 @@ const file_UserService_proto_rawDesc = "" +
 	"\voldPassword\x18\x02 \x01(\tR\voldPassword\x12 \n" +
 	"\vnewPassword\x18\x03 \x01(\tR\vnewPassword\"1\n" +
 	"\x15ResetPasswordResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\xc4\x05\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"-\n" +
+	"\x15GetUserByLoginRequest\x12\x14\n" +
+	"\x05login\x18\x01 \x01(\tR\x05login2\xb2\x06\n" +
 	"\vUserService\x12P\n" +
 	"\vHealthCheck\x12\x16.google.protobuf.Empty\x1a\x18.userGRPC.HealthResponse\"\x0f\x82\xd3\xe4\x93\x02\t\x12\a/health\x12b\n" +
 	"\n" +
@@ -973,7 +1019,8 @@ const file_UserService_proto_rawDesc = "" +
 	"DeleteUser\x12\x1b.userGRPC.DeleteUserRequest\x1a\x1c.userGRPC.DeleteUserResponse\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/user/delete/{username}\x12L\n" +
 	"\x04Auth\x12\x15.userGRPC.AuthRequest\x1a\x16.userGRPC.AuthResponse\"\x15\x82\xd3\xe4\x93\x02\x0f:\x01*\"\n" +
 	"/user/auth\x12|\n" +
-	"\rResetPassword\x12\x1e.userGRPC.ResetPasswordRequest\x1a\x1f.userGRPC.ResetPasswordResponse\"*\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/user/reset-password/{username}B\fZ\n" +
+	"\rResetPassword\x12\x1e.userGRPC.ResetPasswordRequest\x1a\x1f.userGRPC.ResetPasswordResponse\"*\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/user/reset-password/{username}\x12l\n" +
+	"\x0eGetUserByLogin\x12\x1f.userGRPC.GetUserByLoginRequest\x1a\x19.userGRPC.GetUserResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/user/by-login/{login}B\fZ\n" +
 	"grpc/pb;pbb\x06proto3"
 
 var (
@@ -988,7 +1035,7 @@ func file_UserService_proto_rawDescGZIP() []byte {
 	return file_UserService_proto_rawDescData
 }
 
-var file_UserService_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_UserService_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_UserService_proto_goTypes = []any{
 	(*HealthResponse)(nil),        // 0: userGRPC.HealthResponse
 	(*CreateUserRequest)(nil),     // 1: userGRPC.CreateUserRequest
@@ -1005,27 +1052,30 @@ var file_UserService_proto_goTypes = []any{
 	(*AuthResponse)(nil),          // 12: userGRPC.AuthResponse
 	(*ResetPasswordRequest)(nil),  // 13: userGRPC.ResetPasswordRequest
 	(*ResetPasswordResponse)(nil), // 14: userGRPC.ResetPasswordResponse
-	(*emptypb.Empty)(nil),         // 15: google.protobuf.Empty
+	(*GetUserByLoginRequest)(nil), // 15: userGRPC.GetUserByLoginRequest
+	(*emptypb.Empty)(nil),         // 16: google.protobuf.Empty
 }
 var file_UserService_proto_depIdxs = []int32{
 	10, // 0: userGRPC.GetUserResponse.user:type_name -> userGRPC.UserResponse
 	10, // 1: userGRPC.UpdateUserResponse.user:type_name -> userGRPC.UserResponse
-	15, // 2: userGRPC.UserService.HealthCheck:input_type -> google.protobuf.Empty
+	16, // 2: userGRPC.UserService.HealthCheck:input_type -> google.protobuf.Empty
 	1,  // 3: userGRPC.UserService.CreateUser:input_type -> userGRPC.CreateUserRequest
 	3,  // 4: userGRPC.UserService.GetUser:input_type -> userGRPC.GetUserRequest
 	5,  // 5: userGRPC.UserService.UpdateUser:input_type -> userGRPC.UpdateUserRequest
 	7,  // 6: userGRPC.UserService.DeleteUser:input_type -> userGRPC.DeleteUserRequest
 	11, // 7: userGRPC.UserService.Auth:input_type -> userGRPC.AuthRequest
 	13, // 8: userGRPC.UserService.ResetPassword:input_type -> userGRPC.ResetPasswordRequest
-	0,  // 9: userGRPC.UserService.HealthCheck:output_type -> userGRPC.HealthResponse
-	2,  // 10: userGRPC.UserService.CreateUser:output_type -> userGRPC.CreateUserResponse
-	4,  // 11: userGRPC.UserService.GetUser:output_type -> userGRPC.GetUserResponse
-	6,  // 12: userGRPC.UserService.UpdateUser:output_type -> userGRPC.UpdateUserResponse
-	8,  // 13: userGRPC.UserService.DeleteUser:output_type -> userGRPC.DeleteUserResponse
-	12, // 14: userGRPC.UserService.Auth:output_type -> userGRPC.AuthResponse
-	14, // 15: userGRPC.UserService.ResetPassword:output_type -> userGRPC.ResetPasswordResponse
-	9,  // [9:16] is the sub-list for method output_type
-	2,  // [2:9] is the sub-list for method input_type
+	15, // 9: userGRPC.UserService.GetUserByLogin:input_type -> userGRPC.GetUserByLoginRequest
+	0,  // 10: userGRPC.UserService.HealthCheck:output_type -> userGRPC.HealthResponse
+	2,  // 11: userGRPC.UserService.CreateUser:output_type -> userGRPC.CreateUserResponse
+	4,  // 12: userGRPC.UserService.GetUser:output_type -> userGRPC.GetUserResponse
+	6,  // 13: userGRPC.UserService.UpdateUser:output_type -> userGRPC.UpdateUserResponse
+	8,  // 14: userGRPC.UserService.DeleteUser:output_type -> userGRPC.DeleteUserResponse
+	12, // 15: userGRPC.UserService.Auth:output_type -> userGRPC.AuthResponse
+	14, // 16: userGRPC.UserService.ResetPassword:output_type -> userGRPC.ResetPasswordResponse
+	4,  // 17: userGRPC.UserService.GetUserByLogin:output_type -> userGRPC.GetUserResponse
+	10, // [10:18] is the sub-list for method output_type
+	2,  // [2:10] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
 	2,  // [2:2] is the sub-list for extension extendee
 	0,  // [0:2] is the sub-list for field type_name
@@ -1042,7 +1092,7 @@ func file_UserService_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_UserService_proto_rawDesc), len(file_UserService_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

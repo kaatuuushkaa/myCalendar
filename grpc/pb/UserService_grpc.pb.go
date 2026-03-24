@@ -20,13 +20,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_HealthCheck_FullMethodName   = "/userGRPC.UserService/HealthCheck"
-	UserService_CreateUser_FullMethodName    = "/userGRPC.UserService/CreateUser"
-	UserService_GetUser_FullMethodName       = "/userGRPC.UserService/GetUser"
-	UserService_UpdateUser_FullMethodName    = "/userGRPC.UserService/UpdateUser"
-	UserService_DeleteUser_FullMethodName    = "/userGRPC.UserService/DeleteUser"
-	UserService_Auth_FullMethodName          = "/userGRPC.UserService/Auth"
-	UserService_ResetPassword_FullMethodName = "/userGRPC.UserService/ResetPassword"
+	UserService_HealthCheck_FullMethodName    = "/userGRPC.UserService/HealthCheck"
+	UserService_CreateUser_FullMethodName     = "/userGRPC.UserService/CreateUser"
+	UserService_GetUser_FullMethodName        = "/userGRPC.UserService/GetUser"
+	UserService_UpdateUser_FullMethodName     = "/userGRPC.UserService/UpdateUser"
+	UserService_DeleteUser_FullMethodName     = "/userGRPC.UserService/DeleteUser"
+	UserService_Auth_FullMethodName           = "/userGRPC.UserService/Auth"
+	UserService_ResetPassword_FullMethodName  = "/userGRPC.UserService/ResetPassword"
+	UserService_GetUserByLogin_FullMethodName = "/userGRPC.UserService/GetUserByLogin"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -40,6 +41,7 @@ type UserServiceClient interface {
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error)
 	Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error)
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
+	GetUserByLogin(ctx context.Context, in *GetUserByLoginRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 }
 
 type userServiceClient struct {
@@ -120,6 +122,16 @@ func (c *userServiceClient) ResetPassword(ctx context.Context, in *ResetPassword
 	return out, nil
 }
 
+func (c *userServiceClient) GetUserByLogin(ctx context.Context, in *GetUserByLoginRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserResponse)
+	err := c.cc.Invoke(ctx, UserService_GetUserByLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -131,6 +143,7 @@ type UserServiceServer interface {
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
 	Auth(context.Context, *AuthRequest) (*AuthResponse, error)
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
+	GetUserByLogin(context.Context, *GetUserByLoginRequest) (*GetUserResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -161,6 +174,9 @@ func (UnimplementedUserServiceServer) Auth(context.Context, *AuthRequest) (*Auth
 }
 func (UnimplementedUserServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ResetPassword not implemented")
+}
+func (UnimplementedUserServiceServer) GetUserByLogin(context.Context, *GetUserByLoginRequest) (*GetUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetUserByLogin not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -309,6 +325,24 @@ func _UserService_ResetPassword_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetUserByLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserByLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUserByLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetUserByLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUserByLogin(ctx, req.(*GetUserByLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -343,6 +377,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ResetPassword",
 			Handler:    _UserService_ResetPassword_Handler,
+		},
+		{
+			MethodName: "GetUserByLogin",
+			Handler:    _UserService_GetUserByLogin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
