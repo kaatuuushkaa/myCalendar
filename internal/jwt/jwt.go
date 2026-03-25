@@ -147,8 +147,7 @@ func (j *JWT) ParseJWT(tokenString string) (Claims, error) {
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
 		return *claims, nil
 	}
-
-	return Claims{}, nil
+	return Claims{}, errors.New("invalid token claims")
 }
 
 func (j *JWT) SetRefreshTokenValidator(fn func(string) (bool, error)) {

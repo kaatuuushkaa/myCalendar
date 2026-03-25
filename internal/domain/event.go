@@ -1,3 +1,5 @@
+//передаем между слоями системы
+
 package domain
 
 import "time"

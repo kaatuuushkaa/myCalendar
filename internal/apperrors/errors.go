@@ -26,8 +26,10 @@ var (
 
 // auth errors
 var (
-	ErrInvalidToken = status.Error(codes.Unauthenticated, "invalid token")
-	ErrTokenExpired = status.Error(codes.Unauthenticated, "token expired")
+	ErrInvalidToken          = status.Error(codes.Unauthenticated, "invalid token")
+	ErrTokenExpired          = status.Error(codes.Unauthenticated, "token expired")
+	ErrInvalidTokenWithoutID = status.Error(codes.Unauthenticated, "Invalid token: missing user_id")
+	ErrIsValidFalse          = status.Error(codes.PermissionDenied, "Account is not activated")
 )
 
 // common errors

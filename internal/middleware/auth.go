@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"myCalendar/internal/apperrors"
 	"myCalendar/internal/ctxutil"
 	"myCalendar/internal/jwt"
 	"strings"
@@ -34,7 +35,15 @@ func AuthInterceptor(jwtService jwt.IJWT) grpc.UnaryServerInterceptor {
 			if errors.Is(err, jwt.ErrTokenExpired) {
 				return nil, status.Error(codes.Unauthenticated, "Token expired")
 			}
-			return nil, status.Error(codes.Unauthenticated, "Invalid token")
+			return nil, apperrors.ErrInvalidToken
+		}
+
+		if strings.TrimSpace(claims.ID) == "" {
+			return nil, apperrors.ErrInvalidTokenWithoutID
+		}
+
+		if !claims.IsValid {
+			return nil, apperrors.ErrIsValidFalse
 		}
 
 		ctx = ctxutil.NewContextWithUserID(ctx, claims.ID)
